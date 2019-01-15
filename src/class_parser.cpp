@@ -166,8 +166,6 @@ AttributeInfo **read_attribute_info_array(
     {
         AttributeInfo *p_attribute = read_attribute_info(content, offset);
         p_attributes[i] = p_attribute;
-
-        p_attributes[i] = p_attribute;
     }
 
     return p_attributes;
