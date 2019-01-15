@@ -1,6 +1,10 @@
 # ide
 .vscode/
 
+# cmake
+CMakeCache.txt
+CMakeFiles/
+
 # Prerequisites
 *.d
 
