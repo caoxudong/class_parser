@@ -1,6 +1,13 @@
-# class_parser
+class_parser
+===============
 
 A class file parser, based on [JVMS 8][1].
+
+
+# build
+
+    cd build
+    cmake ../CMakeLists.txt
 
 
 
