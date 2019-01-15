@@ -1,9 +1,14 @@
 # ide
 .vscode/
 
+# build
+build/**
+
 # cmake
 CMakeCache.txt
 CMakeFiles/
+Makefile
+cmake_install.cmake
 
 # Prerequisites
 *.d
