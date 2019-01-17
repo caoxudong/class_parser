@@ -7,29 +7,29 @@ typedef unsigned char u1;
 
 static const u4 MAGIC_NUMBER = 0xCAFEBABE;
 
-static const char *CLASS_FILE_ATTRIBUTE_NAME_SOURCE_FILE = "SourceFile";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_INNER_CLASSES = "InnerClasses";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_ENCLOSING_METHOD = "EnclosingMethod";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_SOURCE_DEBUG_EXTENSION = "SourceDebugExtension";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_BOOTSTRAP_METHODS = "BootstrapMethods";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_CONSTANT_VALUE = "ConstantValue";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_CODE = "Code";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_EXCEPTIONS = "Exceptions";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS = "RuntimeVisibleParameterAnnotations";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS = "RuntimeInVisibleParameterAnnotations";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_ANNOTATION_DEFAULT = "AnnotationDefault";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_METHOD_PARAMETERS = "MethodParameters";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_SYNTHETIC = "Synthetic";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_DEPRECATED = "Deprecated";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_SIGNATURE = "Signature";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_ANNOTATIONS = "RuntimeVisibleAnnotations";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_ANNOTATIONS = "RuntimeInVisibleAnnotations";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_LINE_NUMBER_TABLE = "LineNumberTable";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_LOCAL_VARIABLE_TABLE = "LocalVariableTable";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_LOCAL_VARIABLE_TYPE_TABLE = "LocalVariableTypeTable";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_STACK_MAP_TABLE = "StackMapTable";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_TYPE_ANNOTATIONS = "RuntimeVisibleTypeAnnotations";
-static const char *CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_TYPE_ANNOTATIONS = "RuntimeInvisibleTypeAnnotations";
+static const char CLASS_FILE_ATTRIBUTE_NAME_SOURCE_FILE[] = "SourceFile";
+static const char CLASS_FILE_ATTRIBUTE_NAME_INNER_CLASSES[] = "InnerClasses";
+static const char CLASS_FILE_ATTRIBUTE_NAME_ENCLOSING_METHOD[] = "EnclosingMethod";
+static const char CLASS_FILE_ATTRIBUTE_NAME_SOURCE_DEBUG_EXTENSION[] = "SourceDebugExtension";
+static const char CLASS_FILE_ATTRIBUTE_NAME_BOOTSTRAP_METHODS[] = "BootstrapMethods";
+static const char CLASS_FILE_ATTRIBUTE_NAME_CONSTANT_VALUE[] = "ConstantValue";
+static const char CLASS_FILE_ATTRIBUTE_NAME_CODE[] = "Code";
+static const char CLASS_FILE_ATTRIBUTE_NAME_EXCEPTIONS[] = "Exceptions";
+static const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS[] = "RuntimeVisibleParameterAnnotations";
+static const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS[] = "RuntimeInVisibleParameterAnnotations";
+static const char CLASS_FILE_ATTRIBUTE_NAME_ANNOTATION_DEFAULT[] = "AnnotationDefault";
+static const char CLASS_FILE_ATTRIBUTE_NAME_METHOD_PARAMETERS[] = "MethodParameters";
+static const char CLASS_FILE_ATTRIBUTE_NAME_SYNTHETIC[] = "Synthetic";
+static const char CLASS_FILE_ATTRIBUTE_NAME_DEPRECATED[] = "Deprecated";
+static const char CLASS_FILE_ATTRIBUTE_NAME_SIGNATURE[] = "Signature";
+static const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_ANNOTATIONS[] = "RuntimeVisibleAnnotations";
+static const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_ANNOTATIONS[] = "RuntimeInVisibleAnnotations";
+static const char CLASS_FILE_ATTRIBUTE_NAME_LINE_NUMBER_TABLE[] = "LineNumberTable";
+static const char CLASS_FILE_ATTRIBUTE_NAME_LOCAL_VARIABLE_TABLE[] = "LocalVariableTable";
+static const char CLASS_FILE_ATTRIBUTE_NAME_LOCAL_VARIABLE_TYPE_TABLE[] = "LocalVariableTypeTable";
+static const char CLASS_FILE_ATTRIBUTE_NAME_STACK_MAP_TABLE[] = "StackMapTable";
+static const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_TYPE_ANNOTATIONS[] = "RuntimeVisibleTypeAnnotations";
+static const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_TYPE_ANNOTATIONS[] = "RuntimeInvisibleTypeAnnotations";
 
 // class access flags
 enum class_access_flags

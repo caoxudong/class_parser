@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "class_parser.h"
+#include "class_file_types.h"
 
 static u1 read_u1(u1 *content, u4 *offset)
 {
