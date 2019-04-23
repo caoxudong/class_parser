@@ -36,13 +36,13 @@ int main(int argc, char *argv[])
     FILE *f = fopen(class_file_path, "rb");
     fseek(f, 0, SEEK_END);
     long file_size = ftell(f);
-    if (file_size > INT_MAX) 
+    if (file_size > INT_MAX)
     {
         perror("invalid class file, file too large");
         exit(1);
     }
     fseek(f, 0, SEEK_SET); //same as rewind(f);
-    u1 *content = malloc(file_size + 1);
+    u1 *content = (u1 *)malloc(file_size + 1);
     fread(content, file_size, 1, f);
 
     parse(content);

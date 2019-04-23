@@ -1,6 +1,6 @@
 #pragma once
 
-#include "class_file_types.h"
+#include "jvm/basic_types.h"
 
 // parse class file content
 void parse(u1* content);

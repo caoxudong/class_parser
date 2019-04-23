@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "class_file_types.h"
 
 static u1 read_u1(u1 *content, u4 *offset)
@@ -51,7 +52,7 @@ static u2 *read_u2_array(u1 *content, u4 *offset, u4 length)
 
 static void resolve_attribute_content(u2 name_index, u4 length, u1 *info)
 {
-
+    
 }
 
 static void read_attribute_info(u1 *content, u4 *offset)
@@ -61,10 +62,9 @@ static void read_attribute_info(u1 *content, u4 *offset)
     u1 *info = read_u1_array(content, offset, attribute_length);
     printf("attribute: name_index = %u, length = %u, info = %s\n", attribute_name_index, attribute_length, info);
     resolve_attribute_content(attribute_name_index, attribute_length, info);
-    free(info);
 }
 
-static void read_attribute_info_array(u1 *content, u4 *offset, u2 attributes_count)
+static struct attribute_info ** read_attribute_info_array(u1 *content, u4 *offset, u2 attributes_count)
 {
     for (u2 i = 0; i < attributes_count; i++)
     {
@@ -72,7 +72,7 @@ static void read_attribute_info_array(u1 *content, u4 *offset, u2 attributes_cou
     }
 }
 
-static void read_constant_pool_info_array(u1 *content, u4 *offset, u2 constant_pool_count)
+static struct constant_pool_attribute **read_constant_pool_info_array(u1 *content, u4 *offset, u2 constant_pool_count)
 {
     /** 
      * the real count of constant pool info is (constant_pool_count - 1)
@@ -178,13 +178,13 @@ static void read_constant_pool_info_array(u1 *content, u4 *offset, u2 constant_p
         {
             u2 length = read_u2(content, offset);
             u1 *utf8_content = read_u1_array(content, offset, length);
-            printf("constant pool item %u, tag = CONSTANT_POOL_TAGS_UTF8, length = %u, content = 0x", i, length);
-            for (u2 utf8_content_index=0; utf8_content_index < length; utf8_content_index++)
+            setlocale(LC_ALL, "");
+            printf("constant pool item %u, tag = CONSTANT_POOL_TAGS_UTF8, length = %u, content = ", i, length);
+            for (u2 utf8_content_index = 0; utf8_content_index < length; utf8_content_index++)
             {
-                printf("%02x", utf8_content[utf8_content_index]);
+                printf("%lc", utf8_content[utf8_content_index]);
             }
             printf("\n");
-            free(utf8_content);
             break;
         }
 
@@ -220,7 +220,7 @@ static void read_constant_pool_info_array(u1 *content, u4 *offset, u2 constant_p
     }
 }
 
-static void read_field_info_array(u1 *content, u4 *offset, u2 fields_count)
+static struct field_info ** read_field_info_array(u1 *content, u4 *offset, u2 fields_count)
 {
     for (u2 i = 0; i < fields_count; i++)
     {
@@ -236,7 +236,7 @@ static void read_field_info_array(u1 *content, u4 *offset, u2 fields_count)
     }
 }
 
-static void read_method_info_array(u1 *content, u4 *offset, u2 methods_count)
+static struct method_info ** read_method_info_array(u1 *content, u4 *offset, u2 methods_count)
 {
     for (u2 i = 0; i < methods_count; i++)
     {
@@ -252,7 +252,7 @@ static void read_method_info_array(u1 *content, u4 *offset, u2 methods_count)
     }
 }
 
-void parse(u1 *content)
+struct class_file *parse(u1 *content)
 {
     u4 offset = 0;
 
@@ -265,66 +265,80 @@ void parse(u1 *content)
     else
     {
         perror("invalid magic number");
-        return;
+        return NULL;
     }
+    struct class_file *p_class_file = (struct class_file *)malloc(sizeof(struct class_file));
+    p_class_file->magic = magic_number;
 
     // read minor version
     u2 minor_version = read_u2(content, &offset);
+    p_class_file->minor_version = minor_version;
     printf("minor_version: %u\n", minor_version);
 
     // read major version
     u2 major_version = read_u2(content, &offset);
+    p_class_file->major_version = major_version;
     printf("minor_version: %u\n", major_version);
 
     // read constant pool items count
     u2 constant_pool_items_count = read_u2(content, &offset);
+    p_class_file->constant_pool_count = constant_pool_items_count;
     printf("constant pool items count: %u\n", constant_pool_items_count);
 
     // read constant pool
-    read_constant_pool_info_array(content, &offset, constant_pool_items_count);
+    p_class_file->constant_pool = read_constant_pool_info_array(content, &offset, constant_pool_items_count);
 
     // read access flags
     u2 access_flags = read_u2(content, &offset);
+    p_class_file->access_flags = access_flags;
     printf("access flags: %u\n", access_flags);
 
     // read this class
     u2 this_class_constant_pool_index = read_u2(content, &offset);
+    p_class_file->this_class = this_class_constant_pool_index;
     printf("this class constant pool index: %u\n", this_class_constant_pool_index);
 
     // read super class
     u2 super_class_constant_pool_index = read_u2(content, &offset);
+    p_class_file->super_class = super_class_constant_pool_index;
     printf("super class constant pool index: %u\n", super_class_constant_pool_index);
 
     // read interfaces count
     u2 interfaces_count = read_u2(content, &offset);
+    p_class_file->interfaces_count = interfaces_count;
     printf("interfaces count: %u\n", interfaces_count);
 
     // read interfaces
     u2 *interfaces = read_u2_array(content, &offset, interfaces_count);
+    p_class_file->interfaces = interfaces;
     for (u2 i = 0; i < interfaces_count; i++)
     {
         printf("interface: %u\n", interfaces[i]);
     }
-    free(interfaces);
 
     // read fields count
     u2 fields_count = read_u2(content, &offset);
+    p_class_file->fields_count = fields_count;
     printf("fields count: %u\n", fields_count);
 
     // read fields
-    read_field_info_array(content, &offset, fields_count);
+    p_class_file->fields = read_field_info_array(content, &offset, fields_count);
 
     // read methods count
     u2 methods_count = read_u2(content, &offset);
+    p_class_file->methods_count = methods_count;
     printf("methods count: %u\n", methods_count);
 
     // read methods
-    read_method_info_array(content, &offset, methods_count);
+    p_class_file->methods = read_method_info_array(content, &offset, methods_count);
 
     // read attributes count
     u2 attributes_count = read_u2(content, &offset);
+    p_class_file->attributes_count = attributes_count;
     printf("attributes count: %u\n", attributes_count);
 
     // read attributes
-    read_attribute_info_array(content, &offset, attributes_count);
+    p_class_file->attributes = read_attribute_info_array(content, &offset, attributes_count);
+
+    return p_class_file;
 }
