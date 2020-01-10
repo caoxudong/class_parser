@@ -65,7 +65,7 @@ void print_class_file(struct class_file *p_class_file)
     printf("constant pool count: %d\n", p_class_file->constant_pool_count);
     if (p_class_file->constant_pool_count > 1)
     {
-        for (int i = 1; i < p_class_file->constant_pool_count - 1; i++)
+        for (int i = 1; i < p_class_file->constant_pool_count; i++)
         {
             struct constant_pool_entry * p_cp_att =  p_class_file->constant_pool_entries[i];
         }
