@@ -1,6 +1,9 @@
 #pragma once
 
-#include "jvm/basic_types.h"
+typedef unsigned long u8;
+typedef unsigned int u4;
+typedef unsigned short u2;
+typedef unsigned char u1;
 
 const u4 MAGIC_NUMBER = 0xCAFEBABE;
 

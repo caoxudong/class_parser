@@ -6,6 +6,7 @@
 
 #include "class_parser.h"
 
+struct class_file * parse(u1* content);
 void usage(void);
 unsigned long get_file_size(const char *);
 void read_file_content(int input_file_fd, unsigned char *target_buffer, int buffer_offset);
