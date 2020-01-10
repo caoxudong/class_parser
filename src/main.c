@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     u1 *content = (u1 *)malloc(file_size + 1);
     fread(content, file_size, 1, f);
 
-    parse(content);
+    struct class_file *p_class_file = parse(content);
 
     free(content);
     fclose(f);
@@ -54,4 +54,21 @@ int main(int argc, char *argv[])
 void usage(void)
 {
     perror("Please specify the class file path");
+}
+
+void print_class_file(struct class_file *p_class_file)
+{
+    printf("begin to print class file content<<<<<<<<n");
+    printf("magic number: %x\n", p_class_file->magic);
+    printf("minor version: %d\n", p_class_file->minor_version);
+    printf("major version: %d\n", p_class_file->major_version);
+    printf("constant pool count: %d\n", p_class_file->constant_pool_count);
+    if (p_class_file->constant_pool_count > 1)
+    {
+        for (int i = 1; i < p_class_file->constant_pool_count - 1; i++)
+        {
+            struct constant_pool_entry * p_cp_att =  p_class_file->constant_pool_entries[i];
+        }
+    }
+    printf(">>>>>>>>end printing class file");
 }

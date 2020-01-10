@@ -91,110 +91,89 @@ enum constant_pool_tags
     CONSTANT_POOL_TAGS_INVOKE_DYNAMIC = 18
 };
 
-struct constant_pool_base
+struct constant_pool_entry
 {
     u1 tag;
+    u1 *content;
 };
 
-struct constant_pool_class
+struct constant_pool_entry_class
 {
-    struct constant_pool_base base;
     u2 name_index;
 };
 
-struct constant_pool_field_ref
+struct constant_pool_entry_field_ref
 {
-    struct constant_pool_base base;
     u2 class_index;
     u2 name_and_type_index;
 };
 
-struct constant_pool_method_ref
+struct constant_pool_entry_method_ref
 {
-    struct constant_pool_base base;
     u2 class_index;
     u2 name_and_type_index;
 };
 
-struct constant_pool_interface_method_ref
+struct constant_pool_entry_interface_method_ref
 {
-    struct constant_pool_base base;
     u2 class_index;
     u2 name_and_type_index;
 };
 
-struct constant_pool_string
+struct constant_pool_entry_string
 {
-    struct constant_pool_base base;
     u2 string_index;
 };
 
-struct constant_pool_integer
+struct constant_pool_entry_integer
 {
-    struct constant_pool_base base;
     u4 bytes;
 };
 
-struct constant_pool_float
+struct constant_pool_entry_float
 {
-    struct constant_pool_base base;
     u4 bytes;
 };
 
-struct constant_pool_long
+struct constant_pool_entry_long
 {
-    struct constant_pool_base base;
     u4 high_bytes;
     u4 low_bytes;
 };
 
-struct constant_pool_double
+struct constant_pool_entry_double
 {
-    struct constant_pool_base base;
     u4 high_bytes;
     u4 low_bytes;
 };
 
-struct constant_pool_name_and_type
+struct constant_pool_entry_name_and_type
 {
-    struct constant_pool_base base;
     u2 name_index;
     u2 descriptor_index;
 };
 
-struct constant_pool_utf8
+struct constant_pool_entry_utf8
 {
-    struct constant_pool_base base;
     u2 length;
     u1 *bytes;
 };
 
-struct constant_pool_method_handle
+struct constant_pool_entry_method_handle
 {
-    struct constant_pool_base base;
     u1 reference_kind;
     u2 reference_index;
 };
 
-struct constant_pool_method_type
+struct constant_pool_entry_method_type
 {
-    struct constant_pool_base base;
     u2 descriptor_index;
 };
 
-struct constant_pool_intoke_dynamic
+struct constant_pool_entry_invoke_dynamic
 {
-    struct constant_pool_base base;
-
     u2 bootstrap_method_attr_index;
     u2 name_and_type_index;
-};
-
-struct constant_pool_attribute
-{
-    u2 attribute_name_index;
-    u4 attribute_length;
-    u1 *info;
 };
 
 struct field_info
@@ -215,13 +194,20 @@ struct method_info
     struct constant_pool_attribute **attributes;
 };
 
+struct attribute_info
+{
+    u2 attribute_name_index;
+    u4 attribute_length;
+    u1 *info;
+};
+
 struct class_file
 {
     u4 magic;
     u2 minor_version;
     u2 major_version;
     u2 constant_pool_count;
-    struct constant_pool_attribute **constant_pool;
+    struct constant_pool_entry **constant_pool_entries;
     u2 access_flags;
     u2 this_class;
     u2 super_class;
