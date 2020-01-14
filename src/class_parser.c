@@ -52,7 +52,6 @@ static u2 *read_u2_array(u1 *content, u4 *offset, u4 length)
     return u2_array;
 }
 
-
 static void *malloc_and_reset(size_t size)
 {
     void *p = malloc(size);
@@ -60,16 +59,19 @@ static void *malloc_and_reset(size_t size)
     return p;
 }
 
-static void resolve_attribute_content(u2 name_index, u4 length, u1 *info)
+static struct attribute_element **resolve_attribute_content(u2 name_index, u4 length, u1 *info)
 {
+    return NULL;
 }
 
-static void read_attribute_info(u1 *content, u4 *offset)
+static struct attribute_info *read_attribute_info(u1 *content, u4 *offset)
 {
-    u2 attribute_name_index = read_u2(content, offset);
-    u4 attribute_length = read_u4(content, offset);
-    u1 *info = read_u1_array(content, offset, attribute_length);
-    resolve_attribute_content(attribute_name_index, attribute_length, info);
+    struct attribute_info *p_attr = malloc_and_reset(sizeof(struct attribute_info));
+    p_attr->attribute_name_index = read_u2(content, offset);
+    p_attr->attribute_length = read_u4(content, offset);
+    u1 *info = read_u1_array(content, offset, p_attr->attribute_length);
+    p_attr->info = resolve_attribute_content(p_attr->attribute_name_index, p_attr->attribute_length, info);
+    return p_attr;
 }
 
 static struct attribute_info **read_attribute_info_array(u1 *content, u4 *offset, u2 attributes_count)
@@ -254,15 +256,18 @@ static struct constant_pool_entry **read_constant_pool_info_array(u1 *content, u
 
 static struct field_info **read_field_info_array(u1 *content, u4 *offset, u2 fields_count)
 {
+    struct field_info **fields = malloc_and_reset(sizeof(struct field_info *) * fields_count);
     for (u2 i = 0; i < fields_count; i++)
     {
-        u2 access_flags = read_u2(content, offset);
-        u2 name_index = read_u2(content, offset);
-        u2 descriptor_index = read_u2(content, offset);
-        u2 attributes_count = read_u2(content, offset);
-        for (u2 j = 0; j < attributes_count; j++)
+        struct field_info *p_field = malloc_and_reset(sizeof(struct field_info));
+        p_field->access_flags = read_u2(content, offset);
+        p_field->name_index = read_u2(content, offset);
+        p_field->descriptor_index = read_u2(content, offset);
+        p_field->attributes_count = read_u2(content, offset);
+        struct attribute_info **p_attrs = malloc_and_reset(sizeof(struct attribute_info *) * p_field->attributes_count);
+        for (u2 j = 0; j < p_field->attributes_count; j++)
         {
-            read_attribute_info(content, offset);
+            p_attrs[i] = read_attribute_info(content, offset);
         }
     }
     return NULL;

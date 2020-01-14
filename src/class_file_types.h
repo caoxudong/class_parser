@@ -193,6 +193,11 @@ struct attribute_info
     u1 *info;
 };
 
+struct attribute_element
+{
+
+};
+
 struct class_file
 {
     u4 magic;
