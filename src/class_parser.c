@@ -4,6 +4,8 @@
 #include <string.h>
 #include "class_file_types.h"
 
+extern u4 MAGIC_NUMBER;
+
 static u1 read_u1(u1 *content, u4 *offset)
 {
     return (content[(*offset)++] & 0xFF);
@@ -35,9 +37,8 @@ static u1 *read_u1_array(u1 *content, u4 *offset, u4 length)
     u1 *u1_array = (u1 *)malloc(length);
     for (unsigned int i = 0; i < length; i++)
     {
-        u1_array[i] = (content[*offset + i]);
+        u1_array[i] = (content[(*offset)++]);
     }
-    *offset += length;
     return u1_array;
 }
 
@@ -59,21 +60,6 @@ static void *malloc_and_reset(size_t size)
     return p;
 }
 
-static struct constant_pool_entry *build_cp_entry(u1 tag, u1 *content)
-{
-    size_t cp_entry_size = sizeof(struct constant_pool_entry);
-    struct constant_pool_entry *p_cp_entry = malloc_and_reset(cp_entry_size);
-    p_cp_entry->tag = tag;
-    p_cp_entry->content = content;
-    return p_cp_entry;
-}
-
-static void fill_constant_pool(struct constant_pool_entry **p_cp_entries, u2 index, u1 tag, u1 *content)
-{
-    struct constant_pool_entry *p_cp_entry = build_cp_entry(tag, content);
-    p_cp_entries[index] = p_cp_entry;
-}
-
 static void resolve_attribute_content(u2 name_index, u4 length, u1 *info)
 {
 }
@@ -83,7 +69,6 @@ static void read_attribute_info(u1 *content, u4 *offset)
     u2 attribute_name_index = read_u2(content, offset);
     u4 attribute_length = read_u4(content, offset);
     u1 *info = read_u1_array(content, offset, attribute_length);
-    printf("attribute: name_index = %u, length = %u, info = %s\n", attribute_name_index, attribute_length, info);
     resolve_attribute_content(attribute_name_index, attribute_length, info);
 }
 
@@ -98,77 +83,80 @@ static struct attribute_info **read_attribute_info_array(u1 *content, u4 *offset
 
 static struct constant_pool_entry **read_constant_pool_info_array(u1 *content, u4 *offset, u2 constant_pool_count)
 {
-    size_t cp_size = sizeof(struct constant_pool_entry *) * constant_pool_count;
+    size_t cp_size = sizeof(struct constant_pool_entry *) * (constant_pool_count);
     struct constant_pool_entry **p_cp_entries = malloc_and_reset(cp_size);
-    size_t cp_entry_size = sizeof(struct constant_pool_entry);
 
     /** 
-     * the real count of constant pool info is (constant_pool_count - 1)
-     * with the two more slot, finding the target constant pool item can be
-     * constant_pool[slot_number]
+     * the index of constant pool started from 1
      */
-    for (u2 i = 1; i <= constant_pool_count; i++)
+    for (u2 i = 1; i < constant_pool_count; i++)
     {
         u1 tag = read_u1(content, offset);
-        u1 *p_content;
         switch (tag)
         {
         case CONSTANT_POOL_TAGS_CLASS:
         {
             struct constant_pool_entry_class *p_cpe_class = (struct constant_pool_entry_class *)malloc_and_reset(sizeof(struct constant_pool_entry_class));
+            p_cpe_class->tag = tag;
             p_cpe_class->name_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_class;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_class;
             break;
         }
 
         case CONSTANT_POOL_TAGS_FIELD_REF:
         {
             struct constant_pool_entry_field_ref *p_cpe_field = malloc_and_reset(sizeof(struct constant_pool_entry_field_ref));
+            p_cpe_field->tag = tag;
             p_cpe_field->class_index = read_u2(content, offset);
             p_cpe_field->name_and_type_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_field;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_field;
             break;
         }
 
         case CONSTANT_POOL_TAGS_METHOD_REF:
         {
             struct constant_pool_entry_method_ref *p_cpe_method = malloc_and_reset(sizeof(struct constant_pool_entry_method_ref));
+            p_cpe_method->tag = tag;
             p_cpe_method->class_index = read_u2(content, offset);
             p_cpe_method->name_and_type_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_method;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_method;
             break;
         }
 
         case CONSTANT_POOL_TAGS_INTERFACE_METHOD_REF:
         {
             struct constant_pool_entry_interface_method_ref *p_cpe_interface_method = malloc_and_reset(sizeof(struct constant_pool_entry_interface_method_ref));
+            p_cpe_interface_method->tag = tag;
             p_cpe_interface_method->class_index = read_u2(content, offset);
             p_cpe_interface_method->name_and_type_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_interface_method;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_interface_method;
             break;
         }
 
         case CONSTANT_POOL_TAGS_STRING:
         {
             struct constant_pool_entry_string *p_cpe_string = malloc_and_reset(sizeof(struct constant_pool_entry_string));
+            p_cpe_string->tag = tag;
             p_cpe_string->string_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_string;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_string;
             break;
         }
 
         case CONSTANT_POOL_TAGS_INTEGER:
         {
             struct constant_pool_entry_integer *p_cpe_integer = malloc_and_reset(sizeof(struct constant_pool_entry_integer));
+            p_cpe_integer->tag = tag;
             p_cpe_integer->bytes = read_u4(content, offset);
-            p_content = (u1*)p_cpe_integer;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_integer;
             break;
         }
 
         case CONSTANT_POOL_TAGS_FLOAT:
         {
             struct constant_pool_entry_integer *p_cpe_float = malloc_and_reset(sizeof(struct constant_pool_entry_integer));
+            p_cpe_float->tag = tag;
             p_cpe_float->bytes = read_u4(content, offset);
-            p_content = (u1*)p_cpe_float;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_float;
             break;
         }
 
@@ -184,9 +172,10 @@ static struct constant_pool_entry **read_constant_pool_info_array(u1 *content, u
         case CONSTANT_POOL_TAGS_LONG:
         {
             struct constant_pool_entry_long *p_cpe_long = malloc_and_reset(sizeof(struct constant_pool_entry_long));
+            p_cpe_long->tag = tag;
             p_cpe_long->high_bytes = read_u4(content, offset);
             p_cpe_long->low_bytes = read_u4(content, offset);
-            p_content = (u1*)p_cpe_long;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_long;
             // an extra slot in constant pool
             i++;
             break;
@@ -195,9 +184,10 @@ static struct constant_pool_entry **read_constant_pool_info_array(u1 *content, u
         case CONSTANT_POOL_TAGS_DOUBLE:
         {
             struct constant_pool_entry_double *p_cpe_double = malloc_and_reset(sizeof(struct constant_pool_entry_double));
+            p_cpe_double->tag = tag;
             p_cpe_double->high_bytes = read_u4(content, offset);
             p_cpe_double->low_bytes = read_u4(content, offset);
-            p_content = (u1*)p_cpe_double;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_double;
             // an extra slot in constant pool
             i++;
             break;
@@ -206,44 +196,49 @@ static struct constant_pool_entry **read_constant_pool_info_array(u1 *content, u
         case CONSTANT_POOL_TAGS_NAME_AND_TYPE:
         {
             struct constant_pool_entry_name_and_type *p_cpe_name_and_type = malloc_and_reset(sizeof(struct constant_pool_entry_name_and_type));
+            p_cpe_name_and_type->tag = tag;
             p_cpe_name_and_type->name_index = read_u2(content, offset);
             p_cpe_name_and_type->descriptor_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_name_and_type;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_name_and_type;
             break;
         }
 
         case CONSTANT_POOL_TAGS_UTF8:
         {
             struct constant_pool_entry_utf8 *p_cpe_utf8 = malloc_and_reset(sizeof(struct constant_pool_entry_utf8));
+            p_cpe_utf8->tag = tag;
             p_cpe_utf8->length = read_u2(content, offset);
             p_cpe_utf8->bytes = read_u1_array(content, offset, p_cpe_utf8->length);
-            p_content = (u1*)p_cpe_utf8;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_utf8;
             break;
         }
 
         case CONSTANT_POOL_TAGS_METHOD_HANDLE:
         {
             struct constant_pool_entry_method_handle *p_cpe_mh = malloc_and_reset(sizeof(struct constant_pool_entry_method_handle));
+            p_cpe_mh->tag = tag;
             p_cpe_mh->reference_kind = read_u1(content, offset);
             p_cpe_mh->reference_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_mh;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_mh;
             break;
         }
 
         case CONSTANT_POOL_TAGS_METHOD_TYPE:
         {
             struct constant_pool_entry_method_type *p_cpe_mt = malloc_and_reset(sizeof(struct constant_pool_entry_method_type));
+            p_cpe_mt->tag = tag;
             p_cpe_mt->descriptor_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_mt;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_mt;
             break;
         }
 
         case CONSTANT_POOL_TAGS_INVOKE_DYNAMIC:
         {
             struct constant_pool_entry_invoke_dynamic *p_cpe_invokedynamic = malloc_and_reset(sizeof(struct constant_pool_entry_invoke_dynamic));
+            p_cpe_invokedynamic->tag = tag;
             p_cpe_invokedynamic->bootstrap_method_attr_index = read_u2(content, offset);
             p_cpe_invokedynamic->name_and_type_index = read_u2(content, offset);
-            p_content = (u1*)p_cpe_invokedynamic;
+            p_cp_entries[i] = (struct constant_pool_entry *)p_cpe_invokedynamic;
             break;
         }
 
@@ -253,8 +248,6 @@ static struct constant_pool_entry **read_constant_pool_info_array(u1 *content, u
             break;
         }
         }
-
-        fill_constant_pool(p_cp_entries, i, tag, p_content);
     }
     return p_cp_entries;
 }
@@ -266,7 +259,6 @@ static struct field_info **read_field_info_array(u1 *content, u4 *offset, u2 fie
         u2 access_flags = read_u2(content, offset);
         u2 name_index = read_u2(content, offset);
         u2 descriptor_index = read_u2(content, offset);
-        printf("field info: acc_flags = %u, name_index = %u, desc_index = %u\n", access_flags, name_index, descriptor_index);
         u2 attributes_count = read_u2(content, offset);
         for (u2 j = 0; j < attributes_count; j++)
         {
@@ -283,7 +275,6 @@ static struct method_info **read_method_info_array(u1 *content, u4 *offset, u2 m
         u2 access_flags = read_u2(content, offset);
         u2 name_index = read_u2(content, offset);
         u2 descriptor_index = read_u2(content, offset);
-        printf("field info: acc_flags = %u, name_index = %u, desc_index = %u\n", access_flags, name_index, descriptor_index);
         u2 attributes_count = read_u2(content, offset);
         for (u2 j = 0; j < attributes_count; j++)
         {
@@ -300,11 +291,7 @@ struct class_file *parse(u1 *content)
 
     // check magic number
     u4 magic_number = read_u4(content, &offset);
-    if (MAGIC_NUMBER == magic_number)
-    {
-        printf("magic number: %x\n", magic_number);
-    }
-    else
+    if (MAGIC_NUMBER != magic_number)
     {
         perror("invalid magic number");
         return NULL;
@@ -314,17 +301,14 @@ struct class_file *parse(u1 *content)
     // read minor version
     u2 minor_version = read_u2(content, &offset);
     p_class_file->minor_version = minor_version;
-    printf("minor_version: %u\n", minor_version);
 
     // read major version
     u2 major_version = read_u2(content, &offset);
     p_class_file->major_version = major_version;
-    printf("minor_version: %u\n", major_version);
 
     // read constant pool items count
     u2 constant_pool_items_count = read_u2(content, &offset);
     p_class_file->constant_pool_count = constant_pool_items_count;
-    printf("constant pool items count: %u\n", constant_pool_items_count);
 
     // read constant pool
     p_class_file->constant_pool_entries = read_constant_pool_info_array(content, &offset, constant_pool_items_count);
@@ -332,35 +316,26 @@ struct class_file *parse(u1 *content)
     // read access flags
     u2 access_flags = read_u2(content, &offset);
     p_class_file->access_flags = access_flags;
-    printf("access flags: %u\n", access_flags);
 
     // read this class
     u2 this_class_constant_pool_index = read_u2(content, &offset);
     p_class_file->this_class = this_class_constant_pool_index;
-    printf("this class constant pool index: %u\n", this_class_constant_pool_index);
 
     // read super class
     u2 super_class_constant_pool_index = read_u2(content, &offset);
     p_class_file->super_class = super_class_constant_pool_index;
-    printf("super class constant pool index: %u\n", super_class_constant_pool_index);
 
     // read interfaces count
     u2 interfaces_count = read_u2(content, &offset);
     p_class_file->interfaces_count = interfaces_count;
-    printf("interfaces count: %u\n", interfaces_count);
 
     // read interfaces
     u2 *interfaces = read_u2_array(content, &offset, interfaces_count);
     p_class_file->interfaces = interfaces;
-    for (u2 i = 0; i < interfaces_count; i++)
-    {
-        printf("interface: %u\n", interfaces[i]);
-    }
 
     // read fields count
     u2 fields_count = read_u2(content, &offset);
     p_class_file->fields_count = fields_count;
-    printf("fields count: %u\n", fields_count);
 
     // read fields
     p_class_file->fields = read_field_info_array(content, &offset, fields_count);
@@ -368,7 +343,6 @@ struct class_file *parse(u1 *content)
     // read methods count
     u2 methods_count = read_u2(content, &offset);
     p_class_file->methods_count = methods_count;
-    printf("methods count: %u\n", methods_count);
 
     // read methods
     p_class_file->methods = read_method_info_array(content, &offset, methods_count);
@@ -376,7 +350,6 @@ struct class_file *parse(u1 *content)
     // read attributes count
     u2 attributes_count = read_u2(content, &offset);
     p_class_file->attributes_count = attributes_count;
-    printf("attributes count: %u\n", attributes_count);
 
     // read attributes
     p_class_file->attributes = read_attribute_info_array(content, &offset, attributes_count);

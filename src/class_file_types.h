@@ -5,32 +5,6 @@ typedef unsigned int u4;
 typedef unsigned short u2;
 typedef unsigned char u1;
 
-const u4 MAGIC_NUMBER = 0xCAFEBABE;
-
-const char CLASS_FILE_ATTRIBUTE_NAME_SOURCE_FILE[] = "SourceFile";
-const char CLASS_FILE_ATTRIBUTE_NAME_INNER_CLASSES[] = "InnerClasses";
-const char CLASS_FILE_ATTRIBUTE_NAME_ENCLOSING_METHOD[] = "EnclosingMethod";
-const char CLASS_FILE_ATTRIBUTE_NAME_SOURCE_DEBUG_EXTENSION[] = "SourceDebugExtension";
-const char CLASS_FILE_ATTRIBUTE_NAME_BOOTSTRAP_METHODS[] = "BootstrapMethods";
-const char CLASS_FILE_ATTRIBUTE_NAME_CONSTANT_VALUE[] = "ConstantValue";
-const char CLASS_FILE_ATTRIBUTE_NAME_CODE[] = "Code";
-const char CLASS_FILE_ATTRIBUTE_NAME_EXCEPTIONS[] = "Exceptions";
-const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS[] = "RuntimeVisibleParameterAnnotations";
-const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS[] = "RuntimeInVisibleParameterAnnotations";
-const char CLASS_FILE_ATTRIBUTE_NAME_ANNOTATION_DEFAULT[] = "AnnotationDefault";
-const char CLASS_FILE_ATTRIBUTE_NAME_METHOD_PARAMETERS[] = "MethodParameters";
-const char CLASS_FILE_ATTRIBUTE_NAME_SYNTHETIC[] = "Synthetic";
-const char CLASS_FILE_ATTRIBUTE_NAME_DEPRECATED[] = "Deprecated";
-const char CLASS_FILE_ATTRIBUTE_NAME_SIGNATURE[] = "Signature";
-const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_ANNOTATIONS[] = "RuntimeVisibleAnnotations";
-const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_ANNOTATIONS[] = "RuntimeInVisibleAnnotations";
-const char CLASS_FILE_ATTRIBUTE_NAME_LINE_NUMBER_TABLE[] = "LineNumberTable";
-const char CLASS_FILE_ATTRIBUTE_NAME_LOCAL_VARIABLE_TABLE[] = "LocalVariableTable";
-const char CLASS_FILE_ATTRIBUTE_NAME_LOCAL_VARIABLE_TYPE_TABLE[] = "LocalVariableTypeTable";
-const char CLASS_FILE_ATTRIBUTE_NAME_STACK_MAP_TABLE[] = "StackMapTable";
-const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_VISIBLE_TYPE_ANNOTATIONS[] = "RuntimeVisibleTypeAnnotations";
-const char CLASS_FILE_ATTRIBUTE_NAME_RUNTIME_INVISIBLE_TYPE_ANNOTATIONS[] = "RuntimeInvisibleTypeAnnotations";
-
 // class access flags
 enum class_access_flags
 {
@@ -94,6 +68,7 @@ enum constant_pool_tags
     CONSTANT_POOL_TAGS_INVOKE_DYNAMIC = 18
 };
 
+// constant pool entry
 struct constant_pool_entry
 {
     u1 tag;
@@ -102,79 +77,93 @@ struct constant_pool_entry
 
 struct constant_pool_entry_class
 {
+    u1 tag;
     u2 name_index;
 };
 
 struct constant_pool_entry_field_ref
 {
+    u1 tag;
     u2 class_index;
     u2 name_and_type_index;
 };
 
 struct constant_pool_entry_method_ref
 {
+    u1 tag;
     u2 class_index;
     u2 name_and_type_index;
 };
 
 struct constant_pool_entry_interface_method_ref
 {
+    u1 tag;
     u2 class_index;
     u2 name_and_type_index;
 };
 
 struct constant_pool_entry_string
 {
+    u1 tag;
     u2 string_index;
 };
 
 struct constant_pool_entry_integer
 {
+    u1 tag;
     u4 bytes;
 };
 
 struct constant_pool_entry_float
 {
+    u1 tag;
     u4 bytes;
 };
 
 struct constant_pool_entry_long
 {
+    u1 tag;
     u4 high_bytes;
     u4 low_bytes;
 };
 
 struct constant_pool_entry_double
 {
+    u1 tag;
     u4 high_bytes;
     u4 low_bytes;
 };
 
 struct constant_pool_entry_name_and_type
 {
+    u1 tag;
     u2 name_index;
     u2 descriptor_index;
 };
 
 struct constant_pool_entry_utf8
 {
+    u1 tag;
     u2 length;
     u1 *bytes;
 };
 
 struct constant_pool_entry_method_handle
 {
+    u1 tag;
     u1 reference_kind;
     u2 reference_index;
 };
 
 struct constant_pool_entry_method_type
 {
+    u1 tag;
     u2 descriptor_index;
 };
 
 struct constant_pool_entry_invoke_dynamic
 {
+    u1 tag;
     u2 bootstrap_method_attr_index;
     u2 name_and_type_index;
 };
@@ -185,7 +174,7 @@ struct field_info
     u2 name_index;
     u2 descriptor_index;
     u2 attributes_count;
-    struct constant_pool_attribute **attributes;
+    struct attribute_info **attributes;
 };
 
 struct method_info
@@ -194,7 +183,7 @@ struct method_info
     u2 name_index;
     u2 descriptor_index;
     u2 attributes_count;
-    struct constant_pool_attribute **attributes;
+    struct attribute_info **attributes;
 };
 
 struct attribute_info
