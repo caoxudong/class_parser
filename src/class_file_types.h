@@ -5,6 +5,33 @@ typedef unsigned int u4;
 typedef unsigned short u2;
 typedef unsigned char u1;
 
+enum attribute_type
+{
+    ATTR_CONSTANT_VALUE = 1,
+    ATTR_CODE,
+    ATTR_EXCEPTIONS,
+    ATTR_SOURCE_FILE,
+    ATTR_LINE_NUMBER_TABLE,
+    ATTR_LOCAL_VARIABLE_TABLE,
+    ATTR_INNER_CLASSES,
+    ATTR_SYNTHETIC,
+    ATTR_DEPRECATED,
+    ATTR_ENCLOSING_METHOD,
+    ATTR_SIGNATURE,
+    ATTR_SOURCE_DEBUG_EXTENSION,
+    ATTR_LOCAL_VARIABLE_TYPE_TABLE,
+    ATTR_RUNTIME_VISIBLE_ANNOTATIONS,
+    ATTR_RUNTIME_INVISIBLE_ANNOTATIONS,
+    ATTR_RUNTIME_VISIABLE_PARAMETER_ANNOTATIONS,
+    ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS,
+    ATTR_ANNOTATION_DEFAULT,
+    ATTR_STACK_MAP_TABLE,
+    ATTR_BOOTSTRAP_METHODS,
+    ATTR_RUNTIME_VISIBLE_TYPE_ANNOTATIONS,
+    ATTR_RUNTIME_INVISIBLE_TYPE_ANNOTATIONS,
+    ATTR_METHOD_PARAMETERS
+};
+
 // class access flags
 enum class_access_flags
 {
@@ -186,16 +213,286 @@ struct method_info
     struct attribute_info **attributes;
 };
 
-struct attribute_info
+struct attribute_body_constant_value
+{
+    u2 cp_index;
+};
+
+struct attribute_body_code
+{
+    u2 max_stack;
+    u2 max_locals;
+    u4 code_length;
+    u1 *code;
+    u2 exception_table_length;
+    struct attribute_body_code_exception_table **exception_table;
+    u2 attributes_count;
+    struct attribute_info **attributes;
+};
+
+struct attribute_body_code_exception_table
+{
+    u2 start_pc;
+    u2 end_pc;
+    u2 handler_pc;
+    u2 catch_type;
+};
+
+struct attribute_body_stack_map_table
+{
+    u2 number_of_entries;
+    struct attribute_body_stack_map_table_frame **entries;
+};
+
+struct attribute_body_stack_map_table_frame
+{
+};
+
+struct attribute_body_exception
+{
+    u2 number_of_exceptions;
+    u2 *exception_index_table;
+};
+
+struct attribute_body_inner_class
 {
     u2 attribute_name_index;
     u4 attribute_length;
-    u1 *info;
+    u2 number_of_classes;
+    struct attribute_body_inner_class_classes_entry **classes;
 };
 
-struct attribute_element
+struct attribute_body_inner_class_classes_entry
 {
+    u2 inner_class_info_index;
+    u2 outer_class_info_index;
+    u2 inner_name_index;
+    u2 inner_class_access_flags;
+};
 
+struct attribute_body_enclosing_method
+{
+    u2 class_index;
+    u2 method_index;
+};
+
+struct attribute_body_synthetic
+{
+};
+
+struct attribute_body_signature
+{
+    u2 signature_index;
+};
+
+struct attribute_body_source_file
+{
+    u2 sourcefile_index;
+};
+
+struct attribute_body_source_debug_extension
+{
+    u1 *debug_extension;
+};
+
+struct attribute_body_line_number_table
+{
+    u2 line_number_table_length;
+    struct attribute_body_line_number_table_entry **line_number_table;
+};
+
+struct attribute_body_line_number_table_entry
+{
+    u2 start_pc;
+    u2 line_number;
+};
+
+struct attribute_body_local_variable_table
+{
+    u2 local_variable_table_length;
+    struct attribute_body_local_variable_table_entry **local_variable_table;
+};
+
+struct attribute_body_local_variable_table_entry
+{
+    u2 start_pc;
+    u2 length;
+    u2 name_index;
+    u2 descriptor_index;
+    u2 index;
+};
+
+struct attribute_body_local_variable_type_table
+{
+    u2 local_variable_table_length;
+    struct attribute_body_local_variable_type_table_entry **local_variable_table;
+};
+
+struct attribute_body_local_variable_type_table_entry
+{
+    u2 start_pc;
+    u2 length;
+    u2 name_index;
+    u2 descriptor_index;
+    u2 index;
+};
+
+struct attribute_body_deprecated
+{
+};
+
+struct attribute_body_runtime_visible_annotations
+{
+    u2 num_annotations;
+    struct attribute_body_runtime_visible_annotations_annotation **annotations;
+};
+
+struct attribute_body_runtime_visible_annotations_annotation
+{
+    u2 type_index;
+    u2 num_element_value_pairs;
+    struct attribute_body_runtime_visible_annotations_annotation_kv **element_value_pairs;
+};
+
+struct attribute_body_runtime_visible_annotations_annotation_kv
+{
+    u2 element_name_index;
+    struct attribute_body_runtime_visible_annotations_annotation_kv_v *value;
+};
+
+struct attribute_body_runtime_visible_annotations_annotation_kv_v
+{
+    u1 tag;
+    union {
+        u2 const_value_index;
+        struct attribute_body_runtime_visible_annotations_annotation_kv_v_enum_const_value *enum_const_value;
+        u2 class_info_index;
+        struct attribute_body_runtime_visible_annotations *annotation_value;
+        struct attribute_body_runtime_visible_annotations_annotation_kv_v_array_value *array_value;
+    } value;
+};
+
+struct attribute_body_runtime_visible_annotations_annotation_kv_v_enum_const_value
+{
+    u2 type_name_index;
+    u2 const_name_index;
+};
+
+struct attribute_body_runtime_visible_annotations_annotation_kv_v_array_value
+{
+    u2 num_values;
+    struct attribute_body_runtime_visible_annotations_annotation_kv_v *values;
+};
+
+struct attribute_body_runtime_invisible_annotations
+{
+    u2 num_annotations;
+    struct attribute_body_runtime_visible_annotations_annotation **annotations;
+};
+
+struct attribute_body_runtime_visible_parameter_annotations
+{
+    u1 num_parameters;
+    struct attribute_body_runtime_visible_parameter_annotations_parameter_annotations **
+        parameter_annotations;
+};
+
+struct attribute_body_runtime_visible_parameter_annotations_parameter_annotations
+{
+    u2 num_annotations;
+    struct attribute_body_runtime_visible_parameter_annotations **annotation;
+};
+
+struct attribute_body_runtime_invisible_parameter_annotations
+{
+    u1 num_parameters;
+    struct attribute_body_runtime_invisible_parameter_annotations_parameter_annotations **
+        parameter_annotations;
+};
+
+struct attribute_body_runtime_invisible_parameter_annotations_parameter_annotations
+{
+    u2 num_annotations;
+    struct attribute_body_runtime_visible_parameter_annotations **annotation;
+};
+
+struct attribute_body_runtime_visible_type_annotations
+{
+    u2 num_annotations;
+    struct attribute_body_runtime_visible_type_annotations_type_annotation **annotations;
+};
+
+struct attribute_body_runtime_visible_type_annotations_type_annotation
+{
+    u1 target_type;
+    union {
+        type_parameter_target;
+        supertype_target;
+        type_parameter_bound_target;
+        empty_target;
+        method_formal_parameter_target;
+        throws_target;
+        localvar_target;
+        catch_target;
+        offset_target;
+        type_argument_target;
+    } target_info;
+    struct attribute_body_runtime_visible_type_annotations_type_annotation_type_path *target_path;
+    u2 type_index;
+    u2 num_element_value_pairs;
+    struct attribute_body_runtime_visible_annotations **element_value_pairs;
+};
+
+struct attribute_body_runtime_visible_type_annotations_type_annotation_type_path
+{
+    u1 path_length;
+    struct attribute_body_runtime_visible_type_annotations_type_annotation_type_path_path **path;
+};
+
+struct attribute_body_runtime_visible_type_annotations_type_annotation_type_path_path
+{
+    u1 type_path_kind;
+    u1 type_argument_index;
+};
+
+struct attribute_body_runtime_invisible_type_annotations
+{
+    u2 num_annotations;
+    struct attribute_body_runtime_visible_type_annotations_type_annotation **annotations;
+};
+
+struct attribute_body_annotation_default
+{
+    
+};
+
+struct attribute_info
+{
+    enum attribute_type attr_type;
+    u4 attribute_length;
+    union {
+        struct attribute_body_constant_value *constant_value;
+        struct attribute_body_code *code;
+        struct attribute_body_stack_map_table *stack_map_table;
+        struct attribute_body_exception *exception;
+        struct attribute_body_inner_class *inner_class;
+        struct attribute_body_enclosing_method *enclosing_method;
+        struct attribute_body_synthetic *synthetic;
+        struct attribute_body_signature *signature;
+        struct attribute_body_source_file *source_file;
+        struct attribute_body_source_debug_extension *source_debug_extension;
+        struct attribute_body_line_number_table *line_number_table;
+        struct attribute_body_local_variable_table *local_variable_table;
+        struct attribute_body_local_variable_type_table *local_variable_type_table;
+        struct attribute_body_deprecated *deprecated;
+        struct attribute_body_runtime_visible_annotations *runtime_visible_annotations;
+        struct attribute_body_runtime_invisible_annotations *runtime_invisible_annotations;
+        struct attribute_body_runtime_visible_parameter_annotations *runtime_visible_parameter_annotations;
+        struct attribute_body_runtime_invisible_parameter_annotations *runtime_invisible_parameter_annotations;
+        struct attribute_body_runtime_visible_type_annotations *runtime_visible_type_annotation;
+        struct attribute_body_runtime_invisible_type_annotations *runtime_invisble_type_annotation;
+        struct attribute_body_annotation_default *annotation_default;
+    };
 };
 
 struct class_file

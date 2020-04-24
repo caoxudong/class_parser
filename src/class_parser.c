@@ -4,6 +4,30 @@
 #include <string.h>
 #include "class_file_types.h"
 
+static const char *ATTR_NAME_CONSTANT_VALUE = "ConstantValue";
+static const char *ATTR_NAME_CODE = "Code";
+static const char *ATTR_NAME_EXCEPTIONS = "Exceptions";
+static const char *ATTR_NAME_SOURCE_FILE = "SourceFile";
+static const char *ATTR_NAME_LINE_NUMBER_TABLE = "LineNumberTable";
+static const char *ATTR_NAME_LOCAL_VARIABLE_TABLE = "LocalVariableTable";
+static const char *ATTR_NAME_INNER_CLASSES = "InnerClasses";
+static const char *ATTR_NAME_SYNTHETIC = "Synthetic";
+static const char *ATTR_NAME_DEPRECATED = "Deprecated";
+static const char *ATTR_NAME_ENCLOSING_METHOD = "EnclosingMethod";
+static const char *ATTR_NAME_SIGNATURE = "Signature";
+static const char *ATTR_NAME_SOURCE_DEBUG_EXTENSION = "SourceDebugExtension";
+static const char *ATTR_NAME_LOCAL_VARIABLE_TYPE_TABLE = "LocalVariableTypeTable";
+static const char *ATTR_NAME_RUNTIME_VISIBLE_ANNOTATIONS = "RuntimeVisibleAnnotations";
+static const char *ATTR_NAME_RUNTIME_INVISIBLE_ANNOTATIONS = "RuntimeInvisibleAnnotations";
+static const char *ATTR_NAME_RUNTIME_VISIABLE_PARAMETER_ANNOTATIONS = "RuntimeVisibleParameterAnnotations";
+static const char *ATTR_NAME_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS = "RuntimeInvisibleParameterAnnotations";
+static const char *ATTR_NAME_ANNOTATION_DEFAULT = "AnnotationDefault";
+static const char *ATTR_NAME_STACK_MAP_TABLE = "StackMapTable";
+static const char *ATTR_NAME_BOOTSTRAP_METHODS = "BootstrapMethods";
+static const char *ATTR_NAME_RUNTIME_VISIBLE_TYPE_ANNOTATIONS = "RuntimeVisibleTypeAnnotations";
+static const char *ATTR_NAME_RUNTIME_INVISIBLE_TYPE_ANNOTATIONS = "RuntimeInvisibleTypeAnnotations";
+static const char *ATTR_NAME_METHOD_PARAMETERS = "MethodParameters";
+
 extern u4 MAGIC_NUMBER;
 
 static u1 read_u1(u1 *content, u4 *offset)
@@ -57,6 +81,15 @@ static void *malloc_and_reset(size_t size)
     void *p = malloc(size);
     memset(p, 0, size);
     return p;
+}
+
+static enum attribute_type compare_attr_name(struct constant_pool_entry **p_cp_entries, u2 attr_name_index)
+{
+    struct constant_pool_entry *p_cpe = p_cp_entries[attr_name_index];
+    struct constant_pool_entry_utf8 *p_cpe_utf8 = (struct constant_pool_entry_utf8 *)p_cpe;
+    u2 name_length = p_cpe_utf8->length;
+    u1 *name_bytes = p_cpe_utf8->bytes;
+    return NULL;
 }
 
 static struct attribute_element **resolve_attribute_content(u2 name_index, u4 length, u1 *info)
